@@ -120,19 +120,19 @@ class _MyHomePageState extends State<MyHomePage> {
               int statusCode = response.statusCode;
               body = response.body;
 
-              setState(() {
-                // lvData.add(QrData(
-                //     id: '123456',
-                //     city: 'ha noi',
-                //     code: '$barcodeScanRes',
-                //     country: 'viet nam',
-                //     createdAt: '${DateTime.now().microsecondsSinceEpoch}',
-                //     device: 'nano',
-                //     imei: 'nano',
-                //     latlng: '$latitude,$longitude',
-                //     productId: 'nano',
-                //     supplierId: 'nano'));
-              });
+              // setState(() {
+              //   // lvData.add(QrData(
+              //   //     id: '123456',
+              //   //     city: 'ha noi',
+              //   //     code: '$barcodeScanRes',
+              //   //     country: 'viet nam',
+              //   //     createdAt: '${DateTime.now().microsecondsSinceEpoch}',
+              //   //     device: 'nano',
+              //   //     imei: 'nano',
+              //   //     latlng: '$latitude,$longitude',
+              //   //     productId: 'nano',
+              //   //     supplierId: 'nano'));
+              // });
             } else {
               Navigator.push(
                   context,
@@ -169,19 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       builder: (context) => WebViewContainer(
                             url: data,
                           )));
-              setState(() {
-                // lvData.add(QrData(
-                //     id: '123456',
-                //     city: 'ha noi',
-                //     code: '$barcodeScanRes',
-                //     country: 'viet nam',
-                //     createdAt: '${DateTime.now().microsecondsSinceEpoch}',
-                //     device: 'nano',
-                //     imei: 'nano',
-                //     latlng: '$latitude,$longitude',
-                //     productId: 'nano',
-                //     supplierId: 'nano'));
-              });
+
 
             } else {
               data = barcodeScanRes;

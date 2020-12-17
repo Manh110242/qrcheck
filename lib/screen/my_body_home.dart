@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:qrcheck/screen/lisdata.dart';
 import 'package:qrcheck/qr_data.dart';
@@ -12,7 +10,6 @@ class MyBodyHome extends StatefulWidget {
 
 class _MyBodyHomeState extends State<MyBodyHome> {
 
-  // List<QrData> lvQrData = lvData.reversed.toList();
   @override
   void initState() {
     super.initState();

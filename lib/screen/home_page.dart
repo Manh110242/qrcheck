@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:qrcheck/qr_data.dart';
 import 'package:qrcheck/screen/lisdata.dart';
 import 'package:qrcheck/screen/noi_dung.dart';
@@ -13,7 +10,6 @@ import 'my_body_home.dart';
 import 'package:http/http.dart';
 import 'package:device_info/device_info.dart';
 import 'package:geolocator/geolocator.dart';
-
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -92,13 +88,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
           if (barcodeScanRes.startsWith("http")) {
             if (barcodeScanRes.startsWith("http://testqrcode.nanoweb.vn")) {
-              // String maqr = '$barcodeScanRes+nano';
-              // const start = "http://testqrcode.nanoweb.vn/detail?id=";
-              // const end = "+nano";
-              // final startIndex = maqr.indexOf(start);
-              // final endIndex = maqr.indexOf(end, startIndex + start.length);
-              //
-              // data = maqr.substring(startIndex + start.length, endIndex);
               var data1 = barcodeScanRes.split("id=");
               print(data1[1]);
 
@@ -116,23 +105,8 @@ class _MyHomePageState extends State<MyHomePage> {
               };
               // tạo POST request
               Response response = await post(url, body: json);
-              // kiểm tra status code của kết quả response
-              int statusCode = response.statusCode;
               body = response.body;
 
-              // setState(() {
-              //   // lvData.add(QrData(
-              //   //     id: '123456',
-              //   //     city: 'ha noi',
-              //   //     code: '$barcodeScanRes',
-              //   //     country: 'viet nam',
-              //   //     createdAt: '${DateTime.now().microsecondsSinceEpoch}',
-              //   //     device: 'nano',
-              //   //     imei: 'nano',
-              //   //     latlng: '$latitude,$longitude',
-              //   //     productId: 'nano',
-              //   //     supplierId: 'nano'));
-              // });
             } else {
               Navigator.push(
                   context,
@@ -150,8 +124,6 @@ class _MyHomePageState extends State<MyHomePage> {
             };
             // tạo POST request
             Response response = await post(url, body: json);
-            // kiểm tra status code của kết quả response
-            int statusCode = response.statusCode;
             body = response.body;
 
             if (body.startsWith("\"")) {

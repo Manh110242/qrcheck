@@ -68,11 +68,6 @@ class _MyHomePageState extends State<MyHomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [IconButton(icon: Icon(Icons.add),onPressed: (){
-          setState(() {
-            setUpTimedFetch();
-          });
-        },)],
       ),
       body: MyBodyHome(),
       floatingActionButton: FloatingActionButton(

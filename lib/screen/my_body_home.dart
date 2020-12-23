@@ -17,7 +17,7 @@ class _MyBodyHomeState extends State<MyBodyHome> {
 
   @override
   Widget build(BuildContext context) {
-    return (lvData == null)
+    return (lvData == null || lvData.length ==0)
         ? Container(
             child: Center(
               child: Text(

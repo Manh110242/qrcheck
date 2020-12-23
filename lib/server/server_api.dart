@@ -14,7 +14,7 @@ class Server {
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
     Map json = {
-      'imei': '${androidInfo.androidId}',
+      'imei': '${androidInfo.id}',
     };
     try{
       final res = await http.post(url, body: json);

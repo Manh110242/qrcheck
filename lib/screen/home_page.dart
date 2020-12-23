@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:qrcheck/qr_data.dart';
 import 'package:qrcheck/screen/lisdata.dart';
 import 'package:qrcheck/screen/noi_dung.dart';
-import 'package:qrcheck/screen/thong_bao.dart';
 import 'package:qrcheck/screen/web_view_sp.dart';
 import 'package:qrcheck/server/server_api.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
@@ -26,7 +25,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<List<QrData>> future;
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   Timer timer;
-  Map<String, dynamic> _deviceData = <String, dynamic>{};
 
   @override
   void initState() {
@@ -39,43 +37,32 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  getPermission() async {
-    var status = await Permission.locationWhenInUse.serviceStatus;
-    if (Platform.isAndroid) {
-      if (status.isDisabled) {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Bạn đã tắt GPS"),
-                content: const Text(
-                    'Ứng dụng cần sữ dụng GPS để xác định vị trí. Hãy bật lên để có thể sữ dụng'),
-                actions: <Widget>[
-                  FlatButton(
-                      child: Text('Đồng ý'),
-                      onPressed: () {
-                        final AndroidIntent intent = AndroidIntent(
-                            action:
-                                'android.settings.LOCATION_SOURCE_SETTINGS');
-                        intent.launch();
-                        Navigator.of(context, rootNavigator: true).pop();
-                      }),
-                  FlatButton(
-                      child: Text('Thoát'),
-                      onPressed: () {
-                        Timer.periodic(Duration(milliseconds: 1000), (timer) {
-                          setState(() {
-                            Navigator.of(context, rootNavigator: true).pop();
-                            SystemChannels.platform
-                                .invokeMethod('SystemNavigator.pop');
-                          });
-                        });
-                      }),
-                ],
-              );
-            });
-      }
-    }
+  getPermission() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Bạn đã tắt GPS"),
+            content: const Text(
+                'Ứng dụng cần sữ dụng GPS để xác định vị trí. Hãy bật lên để có thể sữ dụng'),
+            actions: <Widget>[
+              FlatButton(
+                  child: Text('Đồng ý'),
+                  onPressed: () {
+                    final AndroidIntent intent = AndroidIntent(
+                        action: 'android.settings.LOCATION_SOURCE_SETTINGS');
+                    intent.launch();
+                    Navigator.of(context, rootNavigator: true).pop();
+                  }),
+              FlatButton(
+                  child: Text('Thoát'),
+                  onPressed: () {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                  }),
+            ],
+          );
+        });
   }
 
   setUpTimedFetch() {
@@ -90,8 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     namephone = androidInfo.model;
     idPhone = androidInfo.id;
-
-    print(androidInfo.id);
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -117,26 +102,20 @@ class _MyHomePageState extends State<MyHomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-              icon: Icon(
-                Icons.add,
-                color: Colors.black,
-              ),
-              onPressed: () {
-                getPermission();
-              })
-        ],
       ),
       body: MyBodyHome(),
       floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.qr_code_scanner,
-          size: 35,
-        ),
-        backgroundColor: Colors.blue.shade900,
-        onPressed: (idPhone == 'QKQ1.190910.002')
-            ? () async {
+          child: Icon(
+            Icons.qr_code_scanner,
+            size: 35,
+          ),
+          backgroundColor: Colors.blue.shade900,
+          onPressed: () async {
+            var status = await Permission.locationWhenInUse.serviceStatus;
+            if (Platform.isAndroid) {
+              if (status.isDisabled) {
+                getPermission();
+              } else {
                 String barcodeScanRes = await scanner.scan();
                 // cài đặt tham số POST request
                 print(barcodeScanRes.runtimeType);
@@ -216,11 +195,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   });
                 });
               }
-            : () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ThongBao()));
-              },
-      ),
+            }
+          }),
     );
   }
 }
@@ -229,3 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
 //  final AndroidIntent intent = AndroidIntent(
 //           action: 'android.settings.LOCATION_SOURCE_SETTINGS');
 //        intent.launch();
+// : () {
+//                 Navigator.push(context,
+//                     MaterialPageRoute(builder: (context) => ThongBao()));
+//               },

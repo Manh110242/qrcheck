@@ -9,7 +9,6 @@ class MyBodyHome extends StatefulWidget {
 }
 
 class _MyBodyHomeState extends State<MyBodyHome> {
-
   @override
   void initState() {
     super.initState();
@@ -17,7 +16,7 @@ class _MyBodyHomeState extends State<MyBodyHome> {
 
   @override
   Widget build(BuildContext context) {
-    return (lvData == null || lvData.length ==0)
+    return (lvData == null || lvData.length == 0)
         ? Container(
             child: Center(
               child: Text(
@@ -29,12 +28,12 @@ class _MyBodyHomeState extends State<MyBodyHome> {
               ),
             ),
           )
-          : ListView.builder(
+        : ListView.builder(
             padding: const EdgeInsets.all(8),
             itemCount: lvData.length,
             itemBuilder: (BuildContext context, int index) {
               QrData qrData = lvData[index];
-              int time = int.parse(qrData.createdAt)*1000;
+              int time = int.parse(qrData.createdAt) * 1000;
 
               String ngay = DateFormat('dd/MM/yyyy', 'en_US')
                   .format(DateTime.fromMillisecondsSinceEpoch(time));
@@ -64,7 +63,7 @@ class _MyBodyHomeState extends State<MyBodyHome> {
                       ),
                       Spacer(),
                       Padding(
-                        padding: const EdgeInsets.only(top:5.0),
+                        padding: const EdgeInsets.only(top: 5.0),
                         child: Column(
                           children: [
                             Text(
@@ -79,9 +78,10 @@ class _MyBodyHomeState extends State<MyBodyHome> {
                               '$ngay',
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold),
+                                color: Colors.black54,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -93,4 +93,3 @@ class _MyBodyHomeState extends State<MyBodyHome> {
             });
   }
 }
-

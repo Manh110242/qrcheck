@@ -16,6 +16,7 @@ class QrData {
     this.createdAt,
     this.productId,
     this.supplierId,
+    this.link,
   });
 
   String id;
@@ -28,6 +29,7 @@ class QrData {
   String createdAt;
   String productId;
   String supplierId;
+  String link;
 
   factory QrData.fromJson(Map<String, dynamic> json) => QrData(
     id: json["id"],
@@ -40,6 +42,7 @@ class QrData {
     createdAt: json["created_at"],
     productId: json["product_id"],
     supplierId: json["supplier_id"],
+    link: json["link"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -53,5 +56,6 @@ class QrData {
     "created_at": createdAt,
     "product_id": productId,
     "supplier_id": supplierId,
+    "link": link,
   };
 }

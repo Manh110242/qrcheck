@@ -15,7 +15,7 @@ class ApiQrCode{
    print(imei);
     String url = 'http://testqrcode.nanoweb.vn/api/app/code/get-list';
     Map<String, dynamic> req_body = new Map();
-    req_body['imei']="$imei";
+    req_body['imei']="425e250c1d78491f";
     req_body['page']="$page";
     req_body['limit']="20";
 

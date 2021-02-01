@@ -9,6 +9,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qrcheck/api_qrcode.dart';
+import 'package:qrcheck/dieu_khoan_su_dung.dart';
+import 'package:qrcheck/hung_dan_su_dung.dart';
+import 'package:qrcheck/lienhe.dart';
 import 'package:qrcheck/model_qr.dart';
 import 'package:qrcheck/noi_dung.dart';
 import 'package:qrcheck/webview_container.dart';
@@ -28,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   var data;
   bool _loading;
   int page = 1;
-  String imageurl = "https://yeudohoa.vn/wp-content/uploads/2018/08/4_WUZI.jpg";
+  String imageurl = "assets/images/defaultImageProfile.png";
   var bloc;
 
   @override
@@ -334,6 +337,7 @@ class _HomePageState extends State<HomePage> {
                                     MaterialPageRoute(
                                         builder: (context) => WebViewContainer(
                                               url: qrData.link,
+                                          title: 'Nội dung mã',
                                             )));
                               }
                             },
@@ -399,8 +403,11 @@ class _HomePageState extends State<HomePage> {
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                              image: NetworkImage(imageurl),
-                              fit: BoxFit.cover)),
+                              image: ExactAssetImage(imageurl),
+                              fit: BoxFit.cover
+                          )
+                      ),
+
                     ),
                     SizedBox(
                       height: 5,
@@ -431,7 +438,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>HuongDanSuDung()));
+              },
               child: ListTile(
                 leading: Icon(
                   Icons.menu_book_sharp,
@@ -442,7 +451,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+               Navigator.push(context, MaterialPageRoute(builder: (context)=>DKSD()));
+              },
               child: ListTile(
                 leading: Icon(
                   Icons.settings,
@@ -453,7 +464,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>LienHe()));
+              },
               child: ListTile(
                 leading: Icon(
                   Icons.headset_mic_outlined,

@@ -5,8 +5,9 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewContainer extends StatefulWidget {
   final String url;
+  final String title;
 
-  WebViewContainer({this.url});
+  WebViewContainer({this.url, this.title});
 
   @override
   _WebViewContainerState createState() => _WebViewContainerState();
@@ -36,7 +37,7 @@ class _WebViewContainerState extends State<WebViewContainer> {
           );
         },),
         title: Text(
-          "Nội Dung Mã",
+          widget.title,
           overflow: TextOverflow.ellipsis,
         ),
       ),

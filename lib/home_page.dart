@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:android_intent/android_intent.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:configurable_expansion_tile/configurable_expansion_tile.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,12 +11,14 @@ import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qrcheck/api_qrcode.dart';
 import 'package:qrcheck/dieu_khoan_su_dung.dart';
-import 'package:qrcheck/hung_dan_su_dung.dart';
+import 'package:qrcheck/history.dart';
+import 'package:qrcheck/home.dart';
+import 'package:qrcheck/screen_details_code.dart';
 import 'package:qrcheck/lienhe.dart';
 import 'package:qrcheck/model_qr.dart';
 import 'package:qrcheck/noi_dung.dart';
+import 'package:qrcheck/screen_qr.dart';
 import 'package:qrcheck/webview_container.dart';
-import 'package:qrscan/qrscan.dart' as scanner;
 import 'dart:io' show Platform;
 
 class HomePage extends StatefulWidget {
@@ -27,12 +30,12 @@ class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   String namePhone, idPhone, lat, long;
-  ScrollController _sc = new ScrollController();
   var data;
   bool _loading;
   int page = 1;
   String imageurl = "assets/images/defaultImageProfile.png";
   var bloc;
+  int index = 0;
 
   @override
   void initState() {
@@ -40,23 +43,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     bloc = new ApiQrCode();
     iosAndroid();
-    getLocaton();
-    _sc.addListener(() {
-      if (_sc.position.pixels == _sc.position.maxScrollExtent) {
-        setState(() {
-          _loading = true;
-          page++;
-        });
-        bloc.getDataQr(idPhone, "$page");
-        Timer.periodic(Duration(milliseconds: 1500), (timer) {
-          if (this.mounted) {
-            setState(() {
-              _loading = false;
-            });
-          }
-        });
-      }
-    });
   }
 
   getPermissionAndroid() {
@@ -85,59 +71,6 @@ class _HomePageState extends State<HomePage> {
             ],
           );
         });
-  }
-
-  getQrCheck() async {
-    String barcodeScanRes = await scanner.scan();
-    print(barcodeScanRes);
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    setState(() {
-      namePhone = androidInfo.model;
-      idPhone = androidInfo.id;
-    });
-    if (barcodeScanRes.startsWith("http")) {
-      if (barcodeScanRes.startsWith("http://testqrcode.nanoweb.vn")) {
-        var data1 = barcodeScanRes.split("id=");
-        print(data1[1]);
-        var s1 = await bloc.postDataQr(
-            data1[1].toString(), lat, long, idPhone, namePhone);
-        print(s1);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => WebViewContainer(
-                      url: barcodeScanRes,
-                    )));
-      } else {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => WebViewContainer(
-                      url: barcodeScanRes,
-                    )));
-      }
-    } else {
-      var dataqr = await bloc.postDataQr(
-          barcodeScanRes.toString(), lat, long, idPhone, namePhone);
-
-      if (dataqr.startsWith("http")) {
-        print(dataqr);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => WebViewContainer(
-                      url: dataqr,
-                    )));
-      } else {
-        data = barcodeScanRes;
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NoiDung(
-                      noidung: data,
-                    )));
-      }
-    }
   }
 
   getPermissionIos() {
@@ -189,201 +122,59 @@ class _HomePageState extends State<HomePage> {
     idPhone = iosInfor.name;
   }
 
-  getLocaton() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    lat = position.latitude.toString();
-    long = position.longitude.toString();
+  CheckPage(){
+    if(index == 0 ){
+      return Home(name: namePhone,);
+    }if(index == 1){
+      return History();
+    }else{
+      return Home(name: namePhone,);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green,
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.green,
         leading: IconButton(
           onPressed: () {
             _scaffoldKey.currentState.openDrawer();
           },
           icon: Icon(
             Icons.toc_sharp,
-            color: Colors.blue,
+            color: Colors.white,
             size: 40,
           ),
         ),
         title: Text(
           "QR Check",
           style: TextStyle(
-            color: Colors.blue.shade600,
+            color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      body: MyBody(),
+      body: CheckPage(),
       drawer: MyDrawer(),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.qr_code_scanner,
-          size: 35,
-        ),
-        backgroundColor: Colors.blue.shade900,
-        onPressed: () async {
-          var status = await Permission.locationWhenInUse.serviceStatus;
-          if (Platform.isAndroid) {
-            if (status.isDisabled) {
-              getPermissionAndroid();
-            } else {
-              getQrCheck();
-            }
-          } else if (Platform.isIOS) {
-            if (status.isDisabled) {
-              getPermissionIos();
-            } else {
-              getQrCheck();
-            }
-          }
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: index,
+        onTap: (value){
+          setState(() {
+            index = value;
+          });
         },
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined,), title: Text('Trang chủ')),
+          BottomNavigationBarItem(icon: Icon(Icons.receipt), title: Text('Lịch sử')),
+        ],
       ),
     );
   }
-
-  Widget MyBody() {
-    return StreamBuilder(
-        stream: bloc.counterStream,
-        builder: (context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
-            return (snapshot.data.length > 0)
-                ? ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    controller: _sc,
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      ModelQR qrData = snapshot.data[index];
-                      int time = int.parse(qrData.createdAt) * 1000;
-                      String ngay = DateFormat('dd/MM/yyyy', 'en_US')
-                          .format(DateTime.fromMillisecondsSinceEpoch(time));
-                      String gio = DateFormat('HH: mm a', 'en_US')
-                          .format(DateTime.fromMillisecondsSinceEpoch(time));
-                      if (snapshot.data.length <= 19) {
-                        return Container(
-                          height: 60,
-                          margin: EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white),
-                          child: ListTile(
-                            onTap: () {
-                              if (qrData.link == null) {
-                                return false;
-                              } else {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => WebViewContainer(
-                                              url: qrData.link,
-                                            )));
-                              }
-                            },
-                            leading: Icon(
-                              Icons.qr_code_scanner,
-                              color: Colors.blue,
-                            ),
-                            title: Text(
-                              '${qrData.code}',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              '$gio, $ngay',
-                              textAlign: TextAlign.end,
-                              style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        );
-                      } else if (index == (snapshot.data.length - 1) &&
-                          _loading == true) {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 40,
-                              width: 40,
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                        );
-                      } else {
-                        return Container(
-                          height: 60,
-                          margin: EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white),
-                          child: ListTile(
-                            onTap: () {
-                              if (qrData.link == null) {
-                                return false;
-                              } else {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => WebViewContainer(
-                                              url: qrData.link,
-                                          title: 'Nội dung mã',
-                                            )));
-                              }
-                            },
-                            leading: Icon(
-                              Icons.qr_code_scanner,
-                              color: Colors.blue,
-                            ),
-                            title: Text(
-                              '${qrData.code}',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              '$gio, $ngay',
-                              textAlign: TextAlign.end,
-                              style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        );
-                      }
-                    })
-                : Container(
-                    child: Center(
-                      child: Text(
-                        'Lịch sữ trống.',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        });
-  }
-
   Widget MyDrawer() {
     return Drawer(
       child: SingleChildScrollView(
@@ -392,7 +183,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               width: double.infinity,
               child: DrawerHeader(
-                decoration: BoxDecoration(color: Colors.blueAccent),
+                decoration: BoxDecoration(color: Colors.green),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -424,9 +215,23 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            ConfigurableExpansionTile(
+              animatedWidgetFollowingHeader: const Icon(
+                Icons.expand_more,
+                color: const Color(0xFF707070),
+              ),
+                header: Text("Manh dep trai"),
+              children: [
+                ListTile(title: Text("manh 12314"),),
+                ListTile(title: Text("manh 12314"),),
+                ListTile(title: Text("manh 12314"),),
+                ListTile(title: Text("manh 12314"),),
+              ],
+            ),
             InkWell(
               onTap: () {
-                Navigator.pop(context);
+               // Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>ScreenDetailsCode()));
               },
               child: ListTile(
                 leading: Icon(
@@ -439,7 +244,7 @@ class _HomePageState extends State<HomePage> {
             ),
             InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>HuongDanSuDung()));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>WebViewContainer(url: 'http://testqrcode.nanoweb.vn/about/hdsd',title: 'Hướng dẫn sử dụng',)));
               },
               child: ListTile(
                 leading: Icon(
@@ -452,7 +257,7 @@ class _HomePageState extends State<HomePage> {
             ),
             InkWell(
               onTap: () {
-               Navigator.push(context, MaterialPageRoute(builder: (context)=>DKSD()));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>WebViewContainer(title: "Điều khoản sử dụng",url: "http://testqrcode.nanoweb.vn/about/privacy",)));
               },
               child: ListTile(
                 leading: Icon(
@@ -482,3 +287,35 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+// var status = await Permission.locationWhenInUse.serviceStatus;
+//           if (Platform.isAndroid) {
+//             if (status.isDisabled) {
+//               getPermissionAndroid();
+//             } else {
+//               getQrCheck();
+//             }
+//           } else if (Platform.isIOS) {
+//             if (status.isDisabled) {
+//               getPermissionIos();
+//             } else {
+//               getQrCheck();
+//             }
+//           }
+
+// floatingActionButton: FloatingActionButton(
+//         child: Icon(
+//           Icons.qr_code_scanner,
+//           size: 35,
+//         ),
+//         backgroundColor: Colors.blue.shade900,
+//         onPressed: () async {
+//           await Permission.camera.request();
+//           var status = await Permission.locationWhenInUse.serviceStatus;
+//           if(status.isDisabled){
+//             getPermissionAndroid();
+//           }else{
+//             Navigator.push(context, MaterialPageRoute(builder: (context)=>ScreenQR()));
+//           }
+//
+//         },
+//       ),

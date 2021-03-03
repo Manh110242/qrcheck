@@ -24,12 +24,12 @@ class _LienHeState extends State<LienHe> {
             children: [
               ListTile(
                 leading: Icon(Icons.phone, color: Colors.blueAccent,),
-                title: Text('Tổng đài hỗ trợ khác hàng'),
+                title: Text('Tổng đài hỗ trợ khách hàng'),
                 subtitle: Text('0902195488'),
               ),
               ListTile(
                 leading: Icon(Icons.mail_outline, color: Colors.blueAccent,),
-                title: Text('Bộ phận chăm sóc khác hàng khác hàng'),
+                title: Text('Bộ phận chăm sóc khách hàng khác hàng'),
                 subtitle: Text('cskh@qrcheck.vn'),
               ),
             ],
